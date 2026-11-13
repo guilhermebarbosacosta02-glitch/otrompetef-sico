@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://guilhermebarbosacosta02-glitch.github.io/otrompetef-sico/sitemap.xml
