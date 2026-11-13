@@ -99,6 +99,8 @@ code { font-size: 0.85em; background: rgba(255, 255, 255, 0.06); padding: 1px 5p
 .metro-bpm input::-webkit-inner-spin-button { -webkit-appearance: none; }
 .metro select { background: none; border: 0; color: var(--muted); cursor: pointer; }
 .metro select option { background: var(--walnut-850); }
+.sound-btn { white-space: nowrap; animation: soundPulse 1.6s ease-in-out infinite; }
+@keyframes soundPulse { 50% { box-shadow: 0 0 0 6px rgba(212, 175, 90, .25); } }
 .meter { width: 8px; height: 34px; border-radius: 4px; background: var(--walnut-950); border: 1px solid var(--line); position: relative; overflow: hidden; }
 .meter span { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(0deg, var(--brass-lo), var(--brass-hi) 80%, #fff); transition: height .06s linear; }
 
@@ -374,6 +376,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
       <button role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" data-tab="settings">Configurações</button>
     </nav>
     <div class="topbar-tools">
+      <button class="btn btn-brass btn-sm sound-btn" id="soundBtn">Ativar som</button>
       <div class="metro" id="metro">
         <button class="metro-toggle" id="metroToggle" aria-pressed="false" title="Ligar ou desligar o metrónomo">
           <span class="metro-dots" id="metroDots" aria-hidden="true"></span>
@@ -4249,14 +4252,48 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
   app.seq = new TF.Sequencer(app.engine);
   app.metro = new TF.Metronome(app.engine);
 
-  // O áudio só pode começar num gesto do utilizador: inicializa no primeiro toque/tecla.
+  // O áudio só pode começar num gesto do utilizador: inicializa e retoma em cada toque/tecla.
+  let silentAudio = null;
   const unlock = () => {
-    app.engine.init().catch((e) => {
+    // iPhone/iPad: tocar um elemento <audio> silencioso faz o som da página ignorar o botão de silêncio
+    if (!silentAudio) {
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = 'playback';
+        const sr = 8000, n = 800, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+        const w = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+        w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+        v.setUint16(22, 1, true); v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+        w(36, 'data'); v.setUint32(40, n * 2, true);
+        silentAudio = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+        silentAudio.loop = true;
+        silentAudio.setAttribute('playsinline', '');
+        const pr = silentAudio.play();
+        if (pr && pr.catch) pr.catch(() => { silentAudio = null; });
+      } catch (e) { silentAudio = null; }
+    }
+    const ctx = app.engine.ctx;
+    if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+    app.engine.init().then(updateSound).catch((e) => {
       console.error(e);
       toast('Não foi possível iniciar o áudio: ' + e.message, 8000);
+      updateSound();
     });
   };
-  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => window.addEventListener(ev, unlock, { capture: true, passive: true }));
+  ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((ev) => window.addEventListener(ev, unlock, { capture: true, passive: true }));
+
+  /* Indicador de som: visível enquanto o áudio não estiver a funcionar */
+  const soundBtn = $('#soundBtn');
+  function updateSound() {
+    const ctx = app.engine.ctx;
+    const on = !!(ctx && ctx.state === 'running' && app.engine.ready);
+    soundBtn.hidden = on;
+  }
+  soundBtn.addEventListener('click', () => { unlock(); setTimeout(updateSound, 300); });
+  setInterval(updateSound, 1000);
+  store.on('engine:ready', (eng) => {
+    updateSound();
+    eng.ctx.addEventListener('statechange', updateSound);
+  });
   if (!globalThis.AudioWorkletNode) {
     toast('Este navegador não suporta AudioWorklet. Use uma versão recente do Chrome, Edge ou Firefox.', 10000);
   }
