@@ -147,7 +147,7 @@
         this.queue = [];
         this.P = {
           brightness: 0.55, breath: 0.35, vibDepth: 14, vibRate: 5.4, vibDelay: 0.32,
-          attack: 1, release: 0.07, mute: 0, humanize: 0.5, gain: 0.32
+          attack: 1, release: 0.07, mute: 0, humanize: 0.5, gain: 0.32, pure: false
         };
         this.port.onmessage = (e) => this.onMessage(e.data);
         const po = options && options.processorOptions;
@@ -236,7 +236,8 @@
         // Glissando (legato) em domínio logarítmico
         const cG = 1 - Math.exp(-n / (0.03 * sr));
         v.logF += (v.logFTarget - v.logF) * cG;
-        const cents = v.scoop + v.jit * 3 + vibS * P.vibDepth * v.vibAmt + v.drop;
+        // tom puro (tubo de Rubens): sem vibrato nem desvios, afinação estável
+        const cents = P.pure ? 0 : v.scoop + v.jit * 3 + vibS * P.vibDepth * v.vibAmt + v.drop;
         const f = Math.pow(2, v.logF + cents / 1200);
         const nextInc = f / sr;
         v.incStart = v.inc === undefined ? nextInc : v.inc;
@@ -250,6 +251,13 @@
         const nH = Math.max(1, Math.min(MAXH, Math.floor(nyq / f)));
         let m = 1, norm = 0;
         const s = v.shape;
+        if (P.pure) {
+          // onda sinusoidal pura: só o fundamental
+          s[1] = 1;
+          for (let k = 1; k <= MAXH; k++) v.dAmp[k] = ((k === 1 ? 1 : 0) - v.amp[k]) / n;
+          v.nHRender = Math.max(1, v.nH); v.nH = 1;
+          return;
+        }
         for (let k = 1; k <= nH; k++) {
           let fk = f * k;
           let a = radiation(fk, P, e) * m;
@@ -289,7 +297,7 @@
         const q = 1.1;
         let nLow = v.nLow, nBand = v.nBand;
         // tremolo acoplado ao vibrato + pequena instabilidade de sopro (humanização)
-        const trem = (1 + 0.12 * (v.vibS || 0) * v.vibAmt * (P.vibDepth / 14)) * (1 + 0.035 * P.humanize * clamp(v.jit, -1, 1));
+        const trem = P.pure ? 1 : (1 + 0.12 * (v.vibS || 0) * v.vibAmt * (P.vibDepth / 14)) * (1 + 0.035 * P.humanize * clamp(v.jit, -1, 1));
         const gain = P.gain;
         for (let i = from; i < to; i++) {
           // Envelope de pressão
@@ -327,7 +335,7 @@
           const hp = wn - nLow - q * nBand;
           nBand += fc * hp;
           const pulse = 0.55 + 0.45 * s1;
-          const noise = nBand * (breath * 0.05 * e * pulse + burst * 0.11);
+          const noise = P.pure ? 0 : nBand * (breath * 0.05 * e * pulse + burst * 0.11);
           out[i] += (acc * loud * trem + noise) * gain;
           v.t++;
         }

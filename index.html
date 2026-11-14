@@ -285,6 +285,49 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
 .track-list .tn { color: var(--ivory); }
 .track-list .ti { font-size: .8rem; color: var(--muted); }
 
+/* ---------- Tubo de Rubens ---------- */
+.tube-stage { margin-top: 8px; border-radius: var(--radius-lg); border: 1px solid var(--line); background: #0d0a08; padding: 14px 16px 12px; }
+.tube-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.tube-head-tools { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.tube-canvas { display: block; width: 100%; height: 340px; border-radius: var(--radius); }
+.tube-readout { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 16px; margin: 12px 2px 0; }
+.tube-readout dt { font-size: .76rem; color: var(--muted); }
+.tube-readout dd { margin: 2px 0 0; font-size: 1.08rem; font-family: var(--serif); color: var(--ivory); }
+.tube-readout .res-on { color: var(--ok); }
+.tube-readout .res-near { color: var(--brass-hi); }
+.tube-readout .res-off { color: var(--low); }
+.tube-nodes { margin: 10px 2px 0; color: var(--muted); font-size: .88rem; }
+.tube-play { margin-top: 18px; }
+.tube-tone { margin-top: 12px; max-width: 640px; }
+.tube-tone .select-field { grid-template-columns: 11em 1fr; }
+.tube-song { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tube-play .keyboard { height: 130px; }
+.tube-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; margin-top: 18px; }
+.tube-grid .card { display: flex; flex-direction: column; gap: 12px; }
+.tube-grid .card p { margin: 0; }
+.num-field { display: grid; grid-template-columns: 11em 1fr auto; align-items: center; gap: 10px; font-size: .9rem; color: var(--muted); }
+.num-field input { width: 100%; max-width: 9em; color: var(--ivory); }
+.num-field em { font-style: normal; }
+.tube-grid .slider-field { grid-template-columns: 11em 1fr auto; }
+.tube-grid .select-field { grid-template-columns: 11em 1fr; }
+.tube-c { color: var(--ivory); font-size: .95rem; }
+.tube-chart { width: 100%; height: 150px; display: block; }
+.best-notes { display: flex; flex-wrap: wrap; gap: 6px; }
+.tube-about p { line-height: 1.55; }
+.tube-stage:fullscreen { display: flex; flex-direction: column; padding: 18px 24px; border-radius: 0; border: 0; }
+.tube-stage:fullscreen .tube-canvas { flex: 1; height: auto; min-height: 0; }
+.tube-stage:fullscreen .tube-readout dd { font-size: 1.5rem; }
+@media (max-width: 1080px) { .tube-readout { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .tube-canvas { height: 240px; }
+  .tube-readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tube-grid { grid-template-columns: 1fr; }
+  .num-field, .tube-grid .slider-field { grid-template-columns: 1fr auto; }
+  .num-field span, .tube-grid .slider-field span { grid-column: 1 / -1; }
+  .tube-grid .select-field { grid-template-columns: 1fr; }
+  .tube-play .kb-scroll .keyboard { min-width: 860px; }
+}
+
 /* ---------- Afinador ---------- */
 .tuner-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 18px; margin-top: 8px; }
 .tuner-card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -337,6 +380,9 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
 @media (max-width: 640px) {
   .app { padding: 0 10px 30px; }
   .brand h1 { font-size: 1.15rem; }
+  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: 0 0 auto; padding: 8px 10px; font-size: .85rem; white-space: nowrap; }
   .metro-bpm span, .metro select { display: none; }
   .readout-note { font-size: 3.2rem; min-height: 3.2rem; }
   .controls { gap: 10px; }
@@ -358,6 +404,8 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.select-field select, .num-field input { min-width: 0; max-width: 100%; width: 100%; }
+@media (max-width: 640px) { .tube-tone .select-field { grid-template-columns: 1fr; } }
 
 </style>
 </head>
@@ -372,6 +420,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
     <nav class="tabs" role="tablist" aria-label="Secções">
       <button role="tab" id="tab-play" aria-controls="panel-play" aria-selected="true" data-tab="play">Tocar</button>
       <button role="tab" id="tab-songs" aria-controls="panel-songs" aria-selected="false" data-tab="songs">Músicas</button>
+      <button role="tab" id="tab-tube" aria-controls="panel-tube" aria-selected="false" data-tab="tube">Tubo de Rubens</button>
       <button role="tab" id="tab-tuner" aria-controls="panel-tuner" aria-selected="false" data-tab="tuner">Afinador</button>
       <button role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" data-tab="settings">Configurações</button>
     </nav>
@@ -533,6 +582,100 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
           <div class="card-head"><h2>Pistas</h2><span class="muted" id="arrInfo"></span></div>
           <ul class="track-list" id="trackList"></ul>
         </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== TUBO DE RUBENS ===================== -->
+  <section class="panel" id="panel-tube" role="tabpanel" aria-labelledby="tab-tube" hidden>
+    <div class="tube-stage" id="tubeStage">
+      <div class="tube-head">
+        <h2>Previsão do tubo de Rubens</h2>
+        <div class="tube-head-tools">
+          <label class="check-field"><input type="checkbox" data-setting="tubeWave"><span>Onda de pressão</span></label>
+          <label class="check-field"><input type="checkbox" data-setting="tubeRuler"><span>Régua</span></label>
+          <button class="btn btn-sm" id="tubeFull">Ecrã inteiro</button>
+        </div>
+      </div>
+      <canvas class="tube-canvas" id="tubeCanvas" aria-label="Simulação das chamas do tubo de Rubens"></canvas>
+      <dl class="tube-readout" aria-live="polite">
+        <div><dt>Frequência</dt><dd id="tbFreq">—</dd></div>
+        <div><dt>Nota</dt><dd id="tbNote">—</dd></div>
+        <div><dt>Comprimento de onda λ</dt><dd id="tbLambda">—</dd></div>
+        <div><dt>Entre chamas altas (λ/2)</dt><dd id="tbHalf">—</dd></div>
+        <div><dt>Modo do tubo mais próximo</dt><dd id="tbMode">—</dd></div>
+        <div><dt>Ressonância</dt><dd id="tbRes">—</dd></div>
+      </dl>
+      <p class="tube-nodes" id="tbNodes"></p>
+    </div>
+
+    <div class="tube-play card">
+      <div class="card-head">
+        <h2>Tocar no tubo</h2>
+        <div class="tube-song">
+          <span class="muted" id="tbSongTitle"></span>
+          <button class="btn btn-sm" id="tbSongPlay">Reproduzir música</button>
+          <button class="btn btn-ghost btn-sm" id="tbSongOpen">Escolher música</button>
+        </div>
+      </div>
+      <div class="kb-scroll"><div class="keyboard" id="tubeKeyboard" aria-label="Teclado musical do tubo"></div></div>
+      <div class="tube-tone">
+        <label class="select-field"><span>Som neste separador</span><select data-setting="tubePure">
+          <option value="true">Tom puro (onda sinusoidal): padrão mais limpo</option>
+          <option value="false">Trompete (com harmónicos): padrão mais complexo</option></select></label>
+      </div>
+      <p class="hint">Também pode usar o teclado do computador, como no separador Tocar, ou pôr uma música a tocar. O tom puro só se aplica enquanto este separador está aberto.</p>
+    </div>
+
+    <div class="tube-grid">
+      <div class="card">
+        <h2>O seu tubo</h2>
+        <label class="num-field"><span>Comprimento interior</span><input type="number" id="tubeLenCm" min="30" max="1000" step="0.5"><em>cm</em></label>
+        <label class="num-field"><span>Número de furos</span><input type="number" data-setting="tubeHoles" id="tubeHoles" min="10" max="240" step="1"></label>
+        <label class="select-field"><span>Gás</span><select data-setting="tubeGas" id="tubeGas"></select></label>
+        <label class="num-field"><span>Temperatura do gás</span><input type="number" id="tubeTemp" min="-10" max="80" step="1"><em>°C</em></label>
+        <p class="tube-c">Velocidade do som no gás: <strong id="tubeCOut">—</strong> <span class="muted" id="tubeCSrc"></span></p>
+        <button class="btn btn-ghost btn-sm" id="tubeCReset" hidden>Voltar ao valor calculado</button>
+        <label class="slider-field"><span>Ressonância do tubo (Q)</span><input type="range" data-setting="tubeQ" min="8" max="80" step="1"><output></output></label>
+        <label class="slider-field"><span>Volume no tubo</span><input type="range" data-setting="tubeGain" min="0.2" max="6" step="0.05"><output></output></label>
+        <label class="slider-field"><span>Realce visual</span><input type="range" data-setting="tubeVisual" min="1" max="12" step="0.1"><output></output></label>
+        <label class="select-field"><span>Comportamento</span><select data-setting="tubeInverted">
+          <option value="false">Normal: chamas altas nos nós</option>
+          <option value="true">Invertido: gás fraco ou som muito forte</option></select></label>
+      </div>
+
+      <div class="card">
+        <h2>Calibrar com o tubo real</h2>
+        <p class="muted small">A velocidade do som depende da mistura de gás e da temperatura dentro do tubo, por isso o mais rigoroso é medi-la. Toque uma nota com um padrão nítido, meça com uma régua a distância entre duas chamas altas seguidas e escreva-a aqui.</p>
+        <label class="num-field"><span>Frequência tocada</span><input type="number" id="calF" min="50" max="3000" step="0.01"><em>Hz</em></label>
+        <button class="btn btn-ghost btn-sm" id="calUseNow">Usar a frequência que está a tocar</button>
+        <label class="num-field"><span>Distância medida</span><input type="number" id="calD" min="1" max="500" step="0.1"><em>cm</em></label>
+        <p class="tube-c" id="calResult">c = 2 × f × distância</p>
+        <button class="btn btn-brass btn-sm" id="calApply" disabled>Usar esta velocidade</button>
+      </div>
+
+      <div class="card">
+        <h2>Notas com ondas mais nítidas</h2>
+        <p class="muted small">Previsão para o seu tubo. As barras mais altas são as notas que ficam perto de uma ressonância.</p>
+        <canvas class="tube-chart" id="tubeChart" height="150"></canvas>
+        <div class="best-notes" id="bestNotes"></div>
+        <p class="muted small" id="chartNote"></p>
+      </div>
+
+      <div class="card">
+        <h2>Música no tubo</h2>
+        <p class="muted small" id="tbSongInfo">Escolha uma música no separador Músicas.</p>
+        <p class="tube-c" id="tbSongScore"></p>
+        <button class="btn btn-brass btn-sm" id="tbSongBest" disabled>Aplicar a melhor transposição</button>
+      </div>
+
+      <div class="card tube-about">
+        <h2>Como ler a previsão</h2>
+        <p class="small">O simulador analisa o som que está a sair da aplicação, nota a nota e com todos os harmónicos do trompete, e calcula a onda estacionária dentro de um tubo fechado nas duas pontas. As ressonâncias ficam em f<sub>n</sub> = n·c / 2L.</p>
+        <p class="small">A altura de cada chama segue o caudal de gás pela lei de Bernoulli. Onde a pressão oscila (antinós) o caudal médio baixa e a chama desce; nos nós a chama fica mais alta. Com gás a pressão baixa ou som muito forte, o padrão pode inverter-se.</p>
+        <p class="small muted">Os furos e o altifalante deslocam para cima os primeiros modos (1.º e 2.º). A partir do 3.º modo, os modelos publicados acertam com erros abaixo de 5%. As posições dos nós dependem só do comprimento de onda e são as mais fiáveis.</p>
+        <p class="small muted">Fontes: Ficken & Stephenson, The Physics Teacher 17 (1979); Gardner, Gee & Dix, J. Acoust. Soc. Am. 125 (2009).</p>
       </div>
     </div>
   </section>
@@ -780,7 +923,20 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
     metroVolume: 0.6,
     engine: 'synth',          // 'synth' | 'samples'
     midiInput: true,
-    showKeyLabels: true
+    showKeyLabels: true,
+    // Tubo de Rubens
+    tubeLength: 1.5,          // m
+    tubeHoles: 60,
+    tubeGas: 'propano',
+    tubeTemp: 25,             // °C
+    tubeCustomC: 0,           // velocidade do som medida (0 = calcular pelo gás e temperatura)
+    tubeQ: 30,
+    tubeInverted: false,
+    tubeGain: 1.2,           // amplitude relativa ≈ 1,2 na ressonância (regime normal; inversão a partir de ≈ 1,55)
+    tubeVisual: 6,
+    tubeWave: true,
+    tubeRuler: true,
+    tubePure: true            // tom puro enquanto o separador do tubo está aberto
   };
 
   const listeners = {};
@@ -997,7 +1153,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
         this.queue = [];
         this.P = {
           brightness: 0.55, breath: 0.35, vibDepth: 14, vibRate: 5.4, vibDelay: 0.32,
-          attack: 1, release: 0.07, mute: 0, humanize: 0.5, gain: 0.32
+          attack: 1, release: 0.07, mute: 0, humanize: 0.5, gain: 0.32, pure: false
         };
         this.port.onmessage = (e) => this.onMessage(e.data);
         const po = options && options.processorOptions;
@@ -1086,7 +1242,8 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
         // Glissando (legato) em domínio logarítmico
         const cG = 1 - Math.exp(-n / (0.03 * sr));
         v.logF += (v.logFTarget - v.logF) * cG;
-        const cents = v.scoop + v.jit * 3 + vibS * P.vibDepth * v.vibAmt + v.drop;
+        // tom puro (tubo de Rubens): sem vibrato nem desvios, afinação estável
+        const cents = P.pure ? 0 : v.scoop + v.jit * 3 + vibS * P.vibDepth * v.vibAmt + v.drop;
         const f = Math.pow(2, v.logF + cents / 1200);
         const nextInc = f / sr;
         v.incStart = v.inc === undefined ? nextInc : v.inc;
@@ -1100,6 +1257,13 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
         const nH = Math.max(1, Math.min(MAXH, Math.floor(nyq / f)));
         let m = 1, norm = 0;
         const s = v.shape;
+        if (P.pure) {
+          // onda sinusoidal pura: só o fundamental
+          s[1] = 1;
+          for (let k = 1; k <= MAXH; k++) v.dAmp[k] = ((k === 1 ? 1 : 0) - v.amp[k]) / n;
+          v.nHRender = Math.max(1, v.nH); v.nH = 1;
+          return;
+        }
         for (let k = 1; k <= nH; k++) {
           let fk = f * k;
           let a = radiation(fk, P, e) * m;
@@ -1139,7 +1303,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
         const q = 1.1;
         let nLow = v.nLow, nBand = v.nBand;
         // tremolo acoplado ao vibrato + pequena instabilidade de sopro (humanização)
-        const trem = (1 + 0.12 * (v.vibS || 0) * v.vibAmt * (P.vibDepth / 14)) * (1 + 0.035 * P.humanize * clamp(v.jit, -1, 1));
+        const trem = P.pure ? 1 : (1 + 0.12 * (v.vibS || 0) * v.vibAmt * (P.vibDepth / 14)) * (1 + 0.035 * P.humanize * clamp(v.jit, -1, 1));
         const gain = P.gain;
         for (let i = from; i < to; i++) {
           // Envelope de pressão
@@ -1177,7 +1341,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
           const hp = wn - nLow - q * nBand;
           nBand += fc * hp;
           const pulse = 0.55 + 0.45 * s1;
-          const noise = nBand * (breath * 0.05 * e * pulse + burst * 0.11);
+          const noise = P.pure ? 0 : nBand * (breath * 0.05 * e * pulse + burst * 0.11);
           out[i] += (acc * loud * trem + noise) * gain;
           v.t++;
         }
@@ -1346,7 +1510,8 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
   function workletParams(s) {
     return {
       brightness: s.brightness, breath: s.breath, vibDepth: s.vibDepth, vibRate: s.vibRate,
-      vibDelay: s.vibDelay, attack: s.attack, release: s.release, mute: +s.mute, humanize: s.humanize
+      vibDelay: s.vibDelay, attack: s.attack, release: s.release, mute: +s.mute, humanize: s.humanize,
+      pure: !!(TF.app && TF.app.pureActive)
     };
   }
 
@@ -1447,7 +1612,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
 
     post(m) {
       if (!this.ready) { this.pending.push(m); this.init().catch(() => {}); return; }
-      if (store.get('engine') === 'samples' && this.sampler.loaded && m.type !== 'params') {
+      if (store.get('engine') === 'samples' && this.sampler.loaded && m.type !== 'params' && !(TF.app && TF.app.pureActive)) {
         this.sampler.handle(m); return;
       }
       this.g.synth.port.postMessage(m);
@@ -1478,6 +1643,9 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
       if (this.sampler) this.sampler.clear();
     }
 
+    refreshParams() {
+      if (this.ready) this.g.synth.port.postMessage({ type: 'params', p: workletParams(store.settings) });
+    }
     onSetting(e) {
       if (!this.ready) return;
       const s = store.settings;
@@ -2584,7 +2752,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
         });
       }
       if (batch.length) {
-        if (this.engine.ready && !(store.get('engine') === 'samples' && this.engine.sampler.loaded)) {
+        if (this.engine.ready && (TF.app && TF.app.pureActive || !(store.get('engine') === 'samples' && this.engine.sampler.loaded))) {
           this.engine.g.synth.port.postMessage({ type: 'batch', events: batch });
         } else batch.forEach((m) => this.engine.post(m));
       }
@@ -2693,6 +2861,167 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
   }
 
   TF.pitch = { makeDetector };
+})();
+
+</script>
+<script>
+/* js/rubens/rubens-model.js */
+/* O Trompete Físico — modelo físico do tubo de Rubens.
+ *
+ * Geometria: tubo de comprimento L com o altifalante numa ponta (x = 0) e uma tampa rígida na
+ * outra (x = L). Num tubo fechado nas duas pontas há antinós de pressão nas extremidades e as
+ * ressonâncias ficam em f_n = n·c / (2L).
+ *
+ * Campo de pressão (altifalante como fonte de velocidade, tampa rígida, perdas por um fator de
+ * qualidade Q através de um número de onda complexo k̃ = k − iα, com α = k / 2Q):
+ *     p(x) ∝ cos(k̃ (L − x)) / sin(k̃ L)
+ *     |p(x)|² = [cos²(k(L−x)) + sinh²(α(L−x))] / [sin²(kL) + sinh²(αL)]
+ * A amplitude cresce muito perto das ressonâncias (sin(kL) → 0).
+ *
+ * Altura das chamas (Ficken & Stephenson, 1979; Gardner & Gee, 2009): o caudal de gás num furo
+ * segue a lei de Bernoulli, q ∝ √(ΔP), e a altura da chama é proporcional ao caudal. Com uma
+ * oscilação de pressão de amplitude relativa a, o caudal médio é
+ *     q(a) = ⟨ √max(0, 1 + a·sin θ) ⟩θ ,
+ * que diminui onde a pressão oscila (antinós). Por isso as chamas são mais altas nos nós de
+ * pressão e mais baixas nos antinós. Com pressão de gás baixa ou som muito forte o efeito pode
+ * inverter-se (modo "invertido").
+ *
+ * Velocidade do som num gás ideal: c = √(γ·R·T / M).
+ */
+(function () {
+  'use strict';
+  const TF = (globalThis.TF = globalThis.TF || {});
+  const R = 8.314462618;
+
+  /* γ (cp/cv) e massa molar M (kg/mol). Fontes: Engineering ToolBox (razões de calor específico). */
+  const GASES = {
+    propano: { name: 'Propano (C₃H₈)', gamma: 1.13, M: 0.044097 },
+    butano: { name: 'Butano (C₄H₁₀)', gamma: 1.094, M: 0.058122 },
+    metano: { name: 'Gás natural (metano, CH₄)', gamma: 1.304, M: 0.016043 },
+    ar: { name: 'Ar (tubo sem gás)', gamma: 1.4, M: 0.028965 }
+  };
+
+  function speedOfSound(gasKey, tempC) {
+    const g = GASES[gasKey] || GASES.propano;
+    return Math.sqrt(g.gamma * R * (tempC + 273.15) / g.M);
+  }
+
+  function resonances(c, L, fmax) {
+    const out = [];
+    for (let n = 1; ; n++) {
+      const f = n * c / (2 * L);
+      if (f > fmax) break;
+      out.push({ n, f });
+    }
+    return out;
+  }
+
+  /* |p(x)|² normalizado (adimensional) para frequência f. */
+  function pressure2(f, x, c, L, Q) {
+    const k = 2 * Math.PI * f / c;
+    const a = k / (2 * Q);
+    const u = L - x;
+    const cu = Math.cos(k * u), sh = Math.sinh(a * u);
+    const sL = Math.sin(k * L), shL = Math.sinh(a * L);
+    return (cu * cu + sh * sh) / (sL * sL + shL * shL);
+  }
+
+  /* Caudal médio relativo q(a) — tabela pré-calculada e interpolação linear. */
+  const QMAX = 8, QN = 801;
+  const QTAB = new Float64Array(QN);
+  (function () {
+    const steps = 720;
+    for (let i = 0; i < QN; i++) {
+      const a = i / (QN - 1) * QMAX;
+      let s = 0;
+      for (let j = 0; j < steps; j++) {
+        const v = 1 + a * Math.sin((j + 0.5) / steps * 2 * Math.PI);
+        if (v > 0) s += Math.sqrt(v);
+      }
+      QTAB[i] = s / steps;
+    }
+  })();
+  function meanFlow(a) {
+    if (a <= 0) return 1;
+    const p = Math.min(a, QMAX) / QMAX * (QN - 1);
+    const i = Math.floor(p);
+    if (i >= QN - 1) return QTAB[QN - 1];
+    const t = p - i;
+    return QTAB[i] * (1 - t) + QTAB[i + 1] * t;
+  }
+
+  /* Altura relativa da chama (0–1) a partir da amplitude relativa de pressão a. */
+  function flameHeight(a, opts) {
+    const V = opts.visualGain;
+    const drop = 1 - meanFlow(a); // redução do caudal médio
+    let h = opts.inverted ? 0.38 + V * drop : 1 - V * drop;
+    return Math.max(0.06, Math.min(1, h));
+  }
+
+  /* Posições dos furos (centros), em metros, com margem igual nas pontas. */
+  function holePositions(L, n) {
+    const out = new Float64Array(n);
+    for (let i = 0; i < n; i++) out[i] = (i + 0.5) / n * L;
+    return out;
+  }
+
+  /* Previsão das chamas para um espectro: lista [{f, amp}] (amplitude linear RMS de cada componente). */
+  function predict(spectrum, cfg, xs) {
+    const n = xs.length;
+    const p2 = new Float64Array(n);
+    for (const comp of spectrum) {
+      const w = comp.amp * comp.amp;
+      if (w <= 0) continue;
+      for (let i = 0; i < n; i++) p2[i] += w * pressure2(comp.f, xs[i], cfg.c, cfg.L, cfg.Q);
+    }
+    const h = new Float64Array(n);
+    const amp = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      amp[i] = cfg.gain * Math.SQRT2 * Math.sqrt(p2[i]);
+      h[i] = flameHeight(amp[i], cfg);
+    }
+    return { h, amp };
+  }
+
+  /* Espectro típico do trompete (mf) para estimar o padrão de uma nota sem a tocar. */
+  const TRUMPET_HARM = [1, 0.95, 0.75, 0.55, 0.38, 0.26, 0.17, 0.11, 0.07, 0.045];
+  function noteSpectrum(freq, level) {
+    let s = 0;
+    TRUMPET_HARM.forEach((a) => { s += a * a; });
+    const k = level / Math.sqrt(s);
+    return TRUMPET_HARM.map((a, i) => ({ f: freq * (i + 1), amp: a * k }));
+  }
+
+  /* Contraste previsto (diferença entre a chama mais alta e a mais baixa) para uma nota. */
+  function noteContrast(freq, cfg, xs, level, pure) {
+    const spec = pure ? [{ f: freq, amp: level || 0.15 }] : noteSpectrum(freq, level || 0.15);
+    const r = predict(spec, cfg, xs);
+    let mx = 0, mn = 1;
+    for (const v of r.h) { if (v > mx) mx = v; if (v < mn) mn = v; }
+    return mx - mn;
+  }
+
+  /* Posições (m) dos nós e antinós de pressão para uma frequência (padrão de onda estacionária). */
+  function nodesAndAntinodes(f, c, L) {
+    const lambda = c / f;
+    const nodes = [], antinodes = [];
+    // a partir da tampa (x = L), antinó; nós a λ/4, 3λ/4, ...
+    for (let d = 0; d <= L + 1e-9; d += lambda / 2) antinodes.push(L - d);
+    for (let d = lambda / 4; d <= L + 1e-9; d += lambda / 2) nodes.push(L - d);
+    return { lambda, nodes: nodes.reverse(), antinodes: antinodes.reverse() };
+  }
+
+  function nearestMode(f, c, L) {
+    const f1 = c / (2 * L);
+    const n = Math.max(1, Math.round(f / f1));
+    const fn = n * f1;
+    return { n, fn, f1, cents: 1200 * Math.log2(f / fn) };
+  }
+
+  TF.rubens = {
+    GASES, speedOfSound, resonances, pressure2, meanFlow, flameHeight, holePositions,
+    predict, noteSpectrum, noteContrast, nodesAndAntinodes, nearestMode
+  };
 })();
 
 </script>
@@ -4117,9 +4446,12 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
     release: (v) => Math.round(v * 1000) + ' ms',
     vibDepth: (v) => Math.round(v) + ' cents',
     vibRate: (v) => fmt1(v) + ' Hz',
-    vibDelay: (v) => fmt1(v) + ' s'
+    vibDelay: (v) => fmt1(v) + ' s',
+    tubeQ: (v) => String(Math.round(v)),
+    tubeGain: (v) => '×' + fmt1(v),
+    tubeVisual: (v) => '×' + fmt1(v)
   };
-  const BOOL_SELECTS = ['flats', 'transposing'];
+  const BOOL_SELECTS = ['flats', 'transposing', 'tubeInverted', 'tubePure'];
   const NUM_SELECTS = ['mute'];
 
   TF.SettingsTab = class {
@@ -4151,6 +4483,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
           let v;
           if (el.type === 'checkbox') v = el.checked;
           else if (el.type === 'range') v = +el.value;
+          else if (el.type === 'number') { v = +el.value; if (!isFinite(v) || el.value === '') return; v = Math.max(+el.min, Math.min(+el.max, v)); }
           else if (BOOL_SELECTS.includes(key)) v = el.value === 'true';
           else if (NUM_SELECTS.includes(key)) v = +el.value;
           else v = el.value;
@@ -4237,6 +4570,522 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
 
 </script>
 <script>
+/* js/ui/rubens-tab.js */
+/* O Trompete Físico — separador "Tubo de Rubens": previsão das chamas a partir do som real. */
+(function () {
+  'use strict';
+  const TF = (globalThis.TF = globalThis.TF || {});
+  const { $, h, fmtHz, fmt1, noteLabel, toast } = TF.ui;
+  const store = TF.store;
+  const T = TF.theory;
+  const RB = TF.rubens;
+  const nf2 = new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const nf0 = new Intl.NumberFormat('pt-PT', { maximumFractionDigits: 0 });
+  const cm = (m) => fmt1(m * 100) + ' cm';
+
+  TF.RubensTab = class {
+    constructor(app) {
+      this.app = app;
+      this.engine = app.engine;
+      this.canvas = $('#tubeCanvas');
+      this.g = this.canvas.getContext('2d');
+      this.hDisp = null;
+      this.flicker = null;
+      this.lastT = 0;
+      this.cache = null;
+      this.dominant = null;
+      this.recentF = [];
+      this.contrastCache = null;
+
+      this.keyboard = new TF.Keyboard($('#tubeKeyboard'), {
+        low: 52, high: 86,
+        onDown: (m, mult) => app.live.down('tube:' + m, m, { velMult: mult }),
+        onUp: (m) => app.live.up('tube:' + m)
+      });
+      store.on('live:note', () => this.keyboard.setActiveSet(app.live.activeMidis()));
+      ['notation', 'flats'].forEach((k) => store.on('setting:' + k, () => { this.keyboard.render(); this.invalidate(); }));
+
+      this.bindTube();
+      this.bindCalibration();
+      this.bindSong();
+      $('#tubeFull').addEventListener('click', () => this.toggleFull());
+      document.addEventListener('fullscreenchange', () => {
+        $('#tubeFull').textContent = document.fullscreenElement ? 'Sair do ecrã inteiro' : 'Ecrã inteiro';
+      });
+      store.on('setting', (e) => { if (!e.key || e.key === '*' || /^tube|^a4$/.test(e.key)) this.invalidate(); });
+      store.on('seq:loaded', () => this.updateSong());
+      store.on('seq:state', () => this.updateSong());
+      this.invalidate();
+    }
+
+    /* ---------- Configuração ---------- */
+    cfg() {
+      const s = store.settings;
+      const cCalc = RB.speedOfSound(s.tubeGas, +s.tubeTemp);
+      const c = s.tubeCustomC > 0 ? +s.tubeCustomC : cCalc;
+      return {
+        L: +s.tubeLength, n: Math.round(+s.tubeHoles), c, cCalc, Q: +s.tubeQ,
+        gain: +s.tubeGain, visualGain: +s.tubeVisual,
+        inverted: s.tubeInverted === true || s.tubeInverted === 'true'
+      };
+    }
+    invalidate() {
+      this.cache = null;
+      this.contrastCache = null;
+      this.showConfig();
+      this.drawChart();
+      this.updateSong();
+    }
+    bindTube() {
+      const gas = $('#tubeGas');
+      Object.entries(RB.GASES).forEach(([k, g]) => gas.appendChild(h('option', { value: k, text: g.name })));
+      gas.value = store.get('tubeGas');
+      const len = $('#tubeLenCm');
+      const showLen = () => { len.value = Math.round(store.get('tubeLength') * 1000) / 10; };
+      showLen();
+      store.on('setting:tubeLength', showLen);
+      len.addEventListener('change', () => {
+        const v = parseFloat(String(len.value).replace(',', '.'));
+        if (!(v >= 30 && v <= 1000)) { toast('Escreva um comprimento entre 30 e 1000 cm.'); showLen(); return; }
+        store.set('tubeLength', v / 100);
+      });
+      const temp = $('#tubeTemp');
+      const showTemp = () => { temp.value = store.get('tubeTemp'); };
+      showTemp();
+      store.on('setting:tubeTemp', showTemp);
+      temp.addEventListener('change', () => {
+        const v = parseFloat(String(temp.value).replace(',', '.'));
+        if (!(v >= -10 && v <= 80)) { toast('Escreva uma temperatura entre −10 e 80 °C.'); showTemp(); return; }
+        store.set('tubeTemp', v);
+      });
+      $('#tubeCReset').addEventListener('click', () => store.set('tubeCustomC', 0));
+    }
+    showConfig() {
+      const c = this.cfg();
+      $('#tubeCOut').textContent = nf0.format(c.c) + ' m/s';
+      $('#tubeCSrc').textContent = store.get('tubeCustomC') > 0
+        ? '(medida no seu tubo)'
+        : `(calculada para ${RB.GASES[store.get('tubeGas')].name.split(' (')[0].toLowerCase()} a ${fmt1(+store.get('tubeTemp'))} °C)`;
+      $('#tubeCReset').hidden = !(store.get('tubeCustomC') > 0);
+    }
+
+    /* ---------- Calibração ---------- */
+    bindCalibration() {
+      const fIn = $('#calF'), dIn = $('#calD'), out = $('#calResult'), btn = $('#calApply');
+      const read = (el) => parseFloat(String(el.value).replace(',', '.'));
+      const upd = () => {
+        const f = read(fIn), d = read(dIn);
+        if (f > 0 && d > 0) {
+          const c = 2 * f * d / 100;
+          const ok = c > 150 && c < 600;
+          out.textContent = `c = 2 × ${nf2.format(f)} Hz × ${fmt1(d)} cm = ${nf0.format(c)} m/s` + (ok ? '' : ' (valor fora do habitual: confirme a medição)');
+          btn.disabled = !ok;
+          this.calC = c;
+        } else { out.textContent = 'c = 2 × f × distância'; btn.disabled = true; }
+      };
+      fIn.addEventListener('input', upd);
+      dIn.addEventListener('input', upd);
+      $('#calUseNow').addEventListener('click', () => {
+        if (!this.dominant) { toast('Toque primeiro uma nota (no teclado deste separador) e mantenha-a.'); return; }
+        fIn.value = this.dominant.f.toFixed(2);
+        upd();
+      });
+      btn.addEventListener('click', () => {
+        store.set('tubeCustomC', Math.round(this.calC * 10) / 10);
+        toast('Velocidade do som do seu tubo: ' + nf0.format(this.calC) + ' m/s. A previsão já a usa.');
+      });
+    }
+
+    /* ---------- Música ---------- */
+    bindSong() {
+      $('#tbSongPlay').addEventListener('click', () => {
+        const seq = this.app.seq;
+        if (!seq.arr) { this.app.showTab('songs'); return; }
+        if (seq.state === 'playing') seq.pause(); else seq.play();
+      });
+      $('#tbSongOpen').addEventListener('click', () => this.app.showTab('songs'));
+      $('#tbSongBest').addEventListener('click', () => {
+        if (this.bestShift === undefined) return;
+        const tr = $('#sTranspose');
+        tr.value = Math.max(-12, Math.min(12, +tr.value + this.bestShift));
+        tr.dispatchEvent(new Event('input'));
+        tr.dispatchEvent(new Event('change'));
+        toast('Transposição aplicada à música.');
+      });
+    }
+    contrastFor(midi) {
+      if (!this.contrastCache) {
+        const c = this.cfg();
+        const xs = RB.holePositions(c.L, Math.min(c.n, 120));
+        this.contrastCache = {};
+        const pure = store.get('tubePure') !== false && store.get('tubePure') !== 'false';
+        for (let m = 40; m <= 100; m++) this.contrastCache[m] = RB.noteContrast(T.freq(m, store.get('a4')), c, xs, 0.13, pure);
+        this.contrastMax = Math.max(0.001, ...Object.values(this.contrastCache).slice(52 - 40, 86 - 40 + 1));
+      }
+      return this.contrastCache[Math.round(midi)] || 0;
+    }
+    updateSong() {
+      const seq = this.app.seq;
+      const btnPlay = $('#tbSongPlay');
+      if (!seq.arr || !seq.song) {
+        $('#tbSongTitle').textContent = '';
+        btnPlay.textContent = 'Escolher música';
+        return;
+      }
+      $('#tbSongTitle').textContent = seq.song.title;
+      btnPlay.textContent = seq.state === 'playing' ? 'Pausa' : 'Reproduzir música';
+      const notes = seq.arr.notes;
+      if (!notes.length) return;
+      const score = (shift) => {
+        let s = 0, w = 0;
+        for (const n of notes) {
+          const m = n.midi + shift;
+          if (m < T.RANGE.low || m > T.RANGE.high) return -1;
+          s += n.dur * this.contrastFor(m); w += n.dur;
+        }
+        return s / w;
+      };
+      const cur = score(0);
+      let best = 0, bestS = cur;
+      const curT = +($('#sTranspose').value || 0);
+      for (let d = -12; d <= 12; d++) {
+        if (curT + d < -12 || curT + d > 12) continue;
+        const sc = score(d);
+        if (sc > bestS + 1e-6) { bestS = sc; best = d; }
+      }
+      this.bestShift = best;
+      $('#tbSongInfo').textContent = `"${seq.song.title}", ${notes.length} notas.`;
+      const pct = (v) => Math.round(Math.min(1, v / this.contrastMax) * 100) + '%';
+      const st = Math.abs(best) === 1 ? 'meio-tom' : 'meios-tons';
+      $('#tbSongScore').textContent = best === 0
+        ? `Nitidez média prevista: ${pct(cur)} da nota mais nítida deste tubo. Já está na melhor transposição.`
+        : `Nitidez média prevista: ${pct(cur)} da nota mais nítida deste tubo. Transpondo ${best > 0 ? '+' : ''}${best} ${st}, sobe para ${pct(bestS)}.`;
+      $('#tbSongBest').disabled = best === 0;
+    }
+
+    /* ---------- Gráfico das melhores notas ---------- */
+    drawChart() {
+      const cv = $('#tubeChart');
+      if (!cv) return;
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      const W = cv.clientWidth || 300, H = cv.clientHeight || 150;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      const g = cv.getContext('2d');
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, W, H);
+      const lo = T.RANGE.low, hi = T.RANGE.high;
+      const vals = [];
+      for (let m = lo; m <= hi; m++) vals.push({ m, v: this.contrastFor(m) });
+      const max = Math.max(0.01, ...vals.map((x) => x.v));
+      const bw = W / vals.length;
+      const cc = this.cfg();
+      const lowMode = (m) => RB.nearestMode(T.freq(m, store.get('a4')), cc.c, cc.L).n <= 2;
+      vals.forEach((x, i) => {
+        const bh = x.v / max * (H - 22);
+        g.fillStyle = lowMode(x.m) ? '#4b4b4b' : x.v > max * 0.75 ? '#f3dc97' : x.v > max * 0.45 ? '#c49a46' : '#5a4422';
+        g.fillRect(i * bw + 1, H - 16 - bh, bw - 2, bh);
+        if (T.pitchClass(x.m) === 0) {
+          g.fillStyle = '#a99d89'; g.font = '10px sans-serif'; g.textAlign = 'left';
+          g.fillText(noteLabel(x.m), i * bw, H - 3);
+        }
+      });
+      const top = vals.filter((x) => !lowMode(x.m)).sort((a, b) => b.v - a.v).slice(0, 6).sort((a, b) => a.m - b.m);
+      const nLow = vals.filter((x) => lowMode(x.m)).length;
+      $('#chartNote').textContent = nLow
+        ? 'A cinzento: notas no 1.º ou 2.º modo do tubo. Os furos e o altifalante deslocam estes modos para cima, por isso confirme-as no tubo real.'
+        : '';
+      const wrap = $('#bestNotes');
+      wrap.innerHTML = '';
+      top.forEach((x) => {
+        const b = h('button', { class: 'btn btn-sm', title: 'Tocar esta nota durante 2 segundos' },
+          noteLabel(x.m) + ' · ' + nf0.format(T.freq(x.m, store.get('a4'))) + ' Hz');
+        b.addEventListener('click', () => {
+          this.engine.init().then(() => this.engine.noteOn({ midi: x.m, vel: store.get('velocity'), art: 3, dur: 2, group: 'live', mono: true }));
+        });
+        wrap.appendChild(b);
+      });
+    }
+
+    /* ---------- Análise do som em tempo real ---------- */
+    buildCache(binHz, nBins) {
+      const c = this.cfg();
+      const xs = RB.holePositions(c.L, c.n);
+      const fMax = 6000;
+      const kMax = Math.min(nBins - 1, Math.floor(fMax / binHz));
+      const p2 = new Array(kMax + 1);
+      for (let k = 1; k <= kMax; k++) {
+        const arr = new Float32Array(c.n);
+        const f = k * binHz;
+        for (let i = 0; i < c.n; i++) arr[i] = RB.pressure2(f, xs[i], c.c, c.L, c.Q);
+        p2[k] = arr;
+      }
+      this.cache = { c, xs, p2, kMax, binHz };
+      this.hDisp = new Float32Array(c.n).fill(1);
+      this.flicker = new Float32Array(c.n).map(() => Math.random() * 100);
+    }
+
+    analyse() {
+      const an = this.engine.analyser;
+      if (!an) return null;
+      const N = an.frequencyBinCount;
+      const binHz = this.engine.ctx.sampleRate / an.fftSize;
+      if (!this.cache || this.cache.binHz !== binHz) this.buildCache(binHz, N);
+      if (!this.fbuf || this.fbuf.length !== N) { this.fbuf = new Float32Array(N); this.tbuf = new Float32Array(an.fftSize); }
+      an.getFloatFrequencyData(this.fbuf);
+      an.getFloatTimeDomainData(this.tbuf);
+      let rms = 0;
+      for (let i = 0; i < this.tbuf.length; i++) rms += this.tbuf[i] * this.tbuf[i];
+      rms = Math.sqrt(rms / this.tbuf.length);
+      const { p2, kMax, c } = this.cache;
+      const n = c.n;
+      const acc = new Float64Array(n);
+      let total = 0, peakK = 0, peakP = 0;
+      const pw = new Float64Array(kMax + 1);
+      for (let k = 1; k <= kMax; k++) {
+        const db = this.fbuf[k];
+        if (!(db > -110)) continue;
+        const p = Math.pow(10, db / 10);
+        pw[k] = p; total += p;
+        if (p > peakP) { peakP = p; peakK = k; }
+      }
+      if (rms < 0.002 || total <= 0) return { rms, a: null };
+      const scale = rms * rms / total; // potência de cada bin em unidades de rms²
+      for (let k = 1; k <= kMax; k++) {
+        const p = pw[k];
+        if (p < peakP * 1e-5) continue;
+        const w = p * scale;
+        const row = p2[k];
+        for (let i = 0; i < n; i++) acc[i] += w * row[i];
+      }
+      const a = new Float64Array(n);
+      for (let i = 0; i < n; i++) a[i] = c.gain * Math.SQRT2 * Math.sqrt(acc[i]);
+      // frequência dominante (afinação precisa pelo YIN; recurso: pico do espetro)
+      if (!this.detect || this.detectSize !== an.fftSize) {
+        this.detect = TF.pitch.makeDetector(this.engine.ctx.sampleRate, an.fftSize, { minF: 60, maxF: 2000, minRms: 0.003 });
+        this.detectSize = an.fftSize;
+      }
+      const r = this.detect(this.tbuf);
+      const f = r.freq > 0 && r.clarity > 0.8 ? r.freq : peakK * this.cache.binHz;
+      return { rms, a, f };
+    }
+
+    frame(t) {
+      const dt = Math.min(0.1, this.lastT ? (t - this.lastT) / 1000 : 0.016);
+      this.lastT = t;
+      let res = null;
+      if (this.engine.ready) res = this.analyse();
+      if (!this.cache) {
+        const c = this.cfg();
+        this.cache = { c, xs: RB.holePositions(c.L, c.n), p2: null, kMax: 0, binHz: 0 };
+        this.hDisp = new Float32Array(c.n).fill(1);
+        this.flicker = new Float32Array(c.n).map(() => Math.random() * 100);
+      }
+      const c = this.cache.c;
+      const target = new Float32Array(c.n);
+      if (res && res.a) {
+        let amax = 0;
+        for (let i = 0; i < c.n; i++) { target[i] = RB.flameHeight(res.a[i], c); if (res.a[i] > amax) amax = res.a[i]; }
+        this.amax = this.amax ? this.amax * 0.9 + amax * 0.1 : amax;
+        this.updateDominant(res.f);
+      } else {
+        target.fill(RB.flameHeight(0, c));
+        this.updateDominant(null);
+      }
+      // as chamas reagem com algum atraso (inércia do caudal de gás)
+      const k = 1 - Math.exp(-dt / 0.11);
+      for (let i = 0; i < c.n; i++) this.hDisp[i] += (target[i] - this.hDisp[i]) * k;
+      this.draw(t);
+    }
+
+    updateDominant(f) {
+      const now = performance.now();
+      if (f && f > 50) {
+        this.recentF.push(f);
+        if (this.recentF.length > 5) this.recentF.shift();
+        const fm = this.recentF.slice().sort((a, b) => a - b)[Math.floor(this.recentF.length / 2)];
+        this.dominant = { f: fm, t: now };
+      } else if (this.dominant && now - this.dominant.t > 700) {
+        this.dominant = null; this.recentF.length = 0;
+      }
+      const d = this.dominant;
+      const c = this.cache.c;
+      if (!d) {
+        ['#tbFreq', '#tbNote', '#tbLambda', '#tbHalf', '#tbMode', '#tbRes'].forEach((s) => { $(s).textContent = '—'; });
+        $('#tbNodes').textContent = 'Toque uma nota ou ponha uma música a tocar para ver a previsão.';
+        $('#tbRes').className = '';
+        return;
+      }
+      const strong = (this.amax || 0) > 1.45;
+      if (d.shown && Math.abs(d.shown - d.f) < 0.05 && this.lastC === c.c && this.lastL === c.L && this.lastStrong === strong) return;
+      d.shown = d.f; this.lastC = c.c; this.lastL = c.L; this.lastStrong = strong;
+      const lam = c.c / d.f;
+      const nm = RB.nearestMode(d.f, c.c, c.L);
+      const { midi, cents } = T.centsOff(d.f, store.get('a4'));
+      $('#tbFreq').textContent = fmtHz(d.f);
+      $('#tbNote').textContent = noteLabel(midi) + (Math.abs(cents) > 15 ? ` (${cents > 0 ? '+' : '−'}${Math.round(Math.abs(cents))} c)` : '');
+      $('#tbLambda').textContent = cm(lam);
+      $('#tbHalf').textContent = cm(lam / 2);
+      $('#tbMode').textContent = `${nm.n}.º modo, ${fmtHz(nm.fn)}`;
+      const bw = 1200 * Math.log2(1 + 1 / (2 * c.Q)); // meia largura de banda do modo, em cents
+      const off = Math.abs(nm.cents);
+      const el = $('#tbRes');
+      if (off <= bw) { el.textContent = 'Em ressonância'; el.className = 'res-on'; }
+      else if (off <= 3 * bw) { el.textContent = `Perto (${Math.round(off)} cents)`; el.className = 'res-near'; }
+      else { el.textContent = `Fora (${Math.round(off)} cents)`; el.className = 'res-off'; }
+      const na = RB.nodesAndAntinodes(d.f, c.c, c.L);
+      const inv = c.inverted;
+      const hiPts = (inv ? na.antinodes : na.nodes).filter((x) => x >= 0 && x <= c.L);
+      const list = hiPts.slice(0, 14).map((x) => fmt1(x * 100)).join('; ');
+      $('#tbNodes').textContent = `Chamas mais altas previstas a ${list}${hiPts.length > 14 ? '…' : ''} cm do altifalante (${inv ? 'antinós' : 'nós'} de pressão).` +
+        (strong && !inv ? ' Atenção: com este volume, as chamas dos antinós começam a voltar a subir (início da inversão). Baixe o "Volume no tubo" para um padrão mais limpo.' : '');
+    }
+
+    /* ---------- Desenho ---------- */
+    fit() {
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      const W = this.canvas.clientWidth || 800, H = this.canvas.clientHeight || 320;
+      if (this.canvas.width !== Math.round(W * dpr) || this.canvas.height !== Math.round(H * dpr)) {
+        this.canvas.width = Math.round(W * dpr); this.canvas.height = Math.round(H * dpr);
+      }
+      this.g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { W, H };
+    }
+
+    draw(t) {
+      const { W, H } = this.fit();
+      const g = this.g;
+      const c = this.cache.c;
+      const showRuler = store.get('tubeRuler'), showWave = store.get('tubeWave');
+      g.clearRect(0, 0, W, H);
+      const bg = g.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#0b0807'); bg.addColorStop(1, '#1d1511');
+      g.fillStyle = bg; g.fillRect(0, 0, W, H);
+
+      const spk = Math.max(46, W * 0.06);
+      const x0 = spk + 8, x1 = W - 22;
+      const tubeH = Math.max(18, Math.min(34, H * 0.08));
+      const rulerH = showRuler ? 34 : 6;
+      const tubeY = H - rulerH - tubeH - 8;
+      const flameMax = Math.max(40, (tubeY - 26) * 0.92);
+      const sx = (x) => x0 + (x / c.L) * (x1 - x0);
+
+      // chamas
+      const n = c.n;
+      const spacing = (x1 - x0) / n;
+      const fw = Math.max(1.8, Math.min(spacing * 0.27, 8));
+      const time = t / 1000;
+      g.save();
+      g.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < n; i++) {
+        const hx = sx(this.cache.xs[i]);
+        const hv = this.hDisp[i];
+        const fl = 1 + 0.035 * Math.sin(time * 13 + this.flicker[i]) + 0.025 * Math.sin(time * 23.7 + this.flicker[i] * 1.7);
+        const fh = Math.max(4, hv * flameMax * fl);
+        const top = tubeY - fh;
+        // chamas baixas ficam mais azuis; altas, amarelas (como se observa nos tubos reais)
+        const yel = Math.max(0, Math.min(1, (hv - 0.25) / 0.6));
+        const grad = g.createLinearGradient(0, tubeY, 0, top);
+        grad.addColorStop(0, 'rgba(60,110,255,0.95)');
+        grad.addColorStop(0.18, `rgba(${Math.round(90 + 140 * yel)},${Math.round(120 + 80 * yel)},${Math.round(255 - 200 * yel)},0.85)`);
+        grad.addColorStop(0.55, `rgba(255,${Math.round(150 + 60 * yel)},${Math.round(60 - 20 * yel)},${0.55 + 0.35 * yel})`);
+        grad.addColorStop(1, 'rgba(255,90,20,0)');
+        g.fillStyle = grad;
+        const sway = Math.sin(time * 5.3 + this.flicker[i]) * fw * 0.25;
+        g.beginPath();
+        g.moveTo(hx - fw, tubeY);
+        g.bezierCurveTo(hx - fw * 1.05, tubeY - fh * 0.45, hx - fw * 0.35 + sway, top + fh * 0.2, hx + sway, top);
+        g.bezierCurveTo(hx + fw * 0.35 + sway, top + fh * 0.2, hx + fw * 1.05, tubeY - fh * 0.45, hx + fw, tubeY);
+        g.closePath();
+        g.fill();
+      }
+      g.restore();
+
+      // onda de pressão (amplitude relativa ao longo do tubo, frequência dominante)
+      const d = this.dominant;
+      if (showWave && d) {
+        const pts = 220;
+        let mx = 0;
+        const vals = [];
+        for (let j = 0; j <= pts; j++) {
+          const x = j / pts * c.L;
+          const v = Math.sqrt(RB.pressure2(d.f, x, c.c, c.L, c.Q));
+          vals.push(v); if (v > mx) mx = v;
+        }
+        const amp = tubeH * 0.42;
+        const cy = tubeY + tubeH / 2;
+        g.strokeStyle = 'rgba(160, 220, 255, 0.85)'; g.lineWidth = 1.5;
+        [1, -1].forEach((sgn) => {
+          g.beginPath();
+          vals.forEach((v, j) => { const X = x0 + j / pts * (x1 - x0), Y = cy - sgn * v / mx * amp; j ? g.lineTo(X, Y) : g.moveTo(X, Y); });
+          g.stroke();
+        });
+      }
+
+      // tubo metálico
+      const tg = g.createLinearGradient(0, tubeY, 0, tubeY + tubeH);
+      tg.addColorStop(0, '#e9d3a4'); tg.addColorStop(0.25, '#b8925a'); tg.addColorStop(0.6, '#7a5a30'); tg.addColorStop(1, '#3d2c17');
+      g.globalAlpha = showWave && d ? 0.55 : 1;
+      g.fillStyle = tg;
+      g.fillRect(x0, tubeY, x1 - x0, tubeH);
+      g.globalAlpha = 1;
+      g.strokeStyle = '#2a1d10'; g.lineWidth = 1;
+      g.strokeRect(x0 + 0.5, tubeY + 0.5, x1 - x0 - 1, tubeH - 1);
+      // tampa
+      g.fillStyle = '#8f949a'; g.fillRect(x1, tubeY - 3, 8, tubeH + 6);
+      // altifalante
+      g.fillStyle = '#22252a'; g.fillRect(x0 - spk, tubeY - tubeH * 0.9, spk - 2, tubeH * 2.8);
+      g.strokeStyle = '#4a4f57'; g.strokeRect(x0 - spk + 0.5, tubeY - tubeH * 0.9 + 0.5, spk - 3, tubeH * 2.8 - 1);
+      const lvl = d ? 1 + 0.05 * Math.sin(time * 40) : 1;
+      g.fillStyle = '#3b3f46';
+      g.beginPath(); g.arc(x0 - spk / 2, tubeY + tubeH * 0.5, spk * 0.32 * lvl, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#8b9098';
+      g.beginPath(); g.arc(x0 - spk / 2, tubeY + tubeH * 0.5, spk * 0.1, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#a99d89'; g.font = '11px sans-serif'; g.textAlign = 'center';
+      g.fillText('altifalante', x0 - spk / 2, tubeY - tubeH * 0.9 - 6);
+
+      // marcas de nós (N) e antinós (A)
+      if (showWave && d) {
+        const na = RB.nodesAndAntinodes(d.f, c.c, c.L);
+        g.font = '600 11px sans-serif'; g.textAlign = 'center';
+        if (na.nodes.length < 40) {
+          na.nodes.forEach((x) => { g.fillStyle = '#9fd18f'; g.fillText('N', sx(x), tubeY + tubeH + 13); });
+          na.antinodes.forEach((x) => { g.fillStyle = '#ff9f7a'; g.fillText('A', sx(x), tubeY + tubeH + 13); });
+        }
+      }
+      // régua (cm, a partir do altifalante)
+      if (showRuler) {
+        const ry = H - rulerH + 12;
+        g.strokeStyle = '#a99d89'; g.fillStyle = '#a99d89'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(x0, ry); g.lineTo(x1, ry); g.stroke();
+        const totalCm = c.L * 100;
+        const step = totalCm > 400 ? 50 : totalCm > 150 ? 10 : 5;
+        const label = totalCm > 400 ? 100 : totalCm > 150 ? 20 : 10;
+        g.font = '10px sans-serif'; g.textAlign = 'center';
+        for (let v = 0; v <= totalCm + 1e-6; v += step) {
+          const X = sx(v / 100);
+          const big = Math.abs(v / label - Math.round(v / label)) < 1e-6;
+          g.beginPath(); g.moveTo(X, ry); g.lineTo(X, ry + (big ? 7 : 4)); g.stroke();
+          if (big) g.fillText(nf0.format(v), X, ry + 18);
+        }
+        g.textAlign = 'left';
+        g.fillText('cm', x0 - spk + 2, ry + 18);
+      }
+      g.textAlign = 'left';
+      g.fillStyle = 'rgba(239,231,214,.55)'; g.font = '12px sans-serif';
+      g.fillText(`Tubo de ${fmt1(c.L * 100)} cm, ${c.n} furos, c = ${nf0.format(c.c)} m/s`, 12, 18);
+    }
+
+    toggleFull() {
+      const el = $('#tubeStage');
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else if (el.requestFullscreen) el.requestFullscreen().catch(() => toast('O ecrã inteiro não está disponível neste browser.'));
+      else toast('O ecrã inteiro não está disponível neste browser.');
+    }
+  };
+})();
+
+</script>
+<script>
 /* js/app.js */
 /* O Trompete Físico — arranque da aplicação, separadores, metrónomo e ciclo de desenho. */
 (function () {
@@ -4302,13 +5151,14 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
   app.songs = new TF.SongsTab(app);
   app.tuner = new TF.TunerTab(app);
   app.settings = new TF.SettingsTab(app);
+  app.rubens = new TF.RubensTab(app);
   store.on('engine:restarted', () => app.tuner.onEngineRestarted());
 
   /* ---------- Separadores ---------- */
   let current = 'play';
   const tabs = $$('.tabs [role="tab"]');
   function showTab(name) {
-    if (current === 'play' && name !== 'play') app.play.releaseAllKeys();
+    if ((current === 'play' || current === 'tube') && name !== current) app.play.releaseAllKeys();
     current = name;
     tabs.forEach((t) => {
       const on = t.dataset.tab === name;
@@ -4317,7 +5167,14 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
       $('#panel-' + t.dataset.tab).hidden = !on;
     });
     try { sessionStorage.setItem('tf-tab', name); } catch (e) { /* ignora */ }
+    updatePure();
   }
+  function updatePure() {
+    app.pureActive = current === 'tube' && store.get('tubePure') !== false && store.get('tubePure') !== 'false';
+    app.engine.refreshParams();
+  }
+  store.on('setting:tubePure', updatePure);
+  store.on('engine:ready', updatePure);
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => showTab(t.dataset.tab));
     t.addEventListener('keydown', (e) => {
@@ -4333,12 +5190,12 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
   /* ---------- Teclado global ---------- */
   window.addEventListener('keydown', (e) => {
     let handled = false;
-    if (current === 'play') handled = app.play.onKeyDown(e);
+    if (current === 'play' || current === 'tube') handled = app.play.onKeyDown(e);
     else if (current === 'songs') handled = app.songs.onKeyDown(e);
     if (handled) e.preventDefault();
   });
   window.addEventListener('keyup', (e) => {
-    if (current === 'play' && app.play.onKeyUp(e)) e.preventDefault();
+    if ((current === 'play' || current === 'tube') && app.play.onKeyUp(e)) e.preventDefault();
   });
   // evita notas presas quando a janela perde o foco
   window.addEventListener('blur', () => app.play.releaseAllKeys());
@@ -4389,6 +5246,7 @@ input[type="range"]:disabled { opacity: .4; cursor: not-allowed; }
     try {
       if (current === 'play') app.play.frame();
       else if (current === 'songs') app.songs.frame();
+      else if (current === 'tube') app.rubens.frame(t);
       else if (current === 'tuner' && t - lastTuner > 30) { lastTuner = t; app.tuner.frame(); }
       if (current !== 'songs' && app.seq.state === 'playing') app.songs.frame();
     } catch (e) { console.error(e); }
